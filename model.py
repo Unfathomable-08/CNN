@@ -7,6 +7,8 @@ import torch.nn.functional as F
 import numpy as np
 
 
+# DATA LOADER CLASS
+
 class CustomDataset(Dataset):
     def __init__(self, root_dir):
         self.root_dir = root_dir
@@ -39,7 +41,9 @@ class CustomDataset(Dataset):
 
         return image, torch.tensor(label).long()
 
-# Usage:
+
+# USAGE
+
 dataset = CustomDataset('./dataset')
 
 train_size = int(0.8 * len(dataset))
@@ -53,6 +57,7 @@ print("Classes:", dataset.classes)
 print(f"Train samples: {len(train_dataset)} | Test samples: {len(test_dataset)}")
 
 
+# MAIN MODEL
 
 class CNN(nn.Module):
     def __init__(self, num_classes):
@@ -79,9 +84,11 @@ class CNN(nn.Module):
         return x
 
 
+# TRAIN FUNCTION
+
 def train(model, train_loader, criterion, optimizer, device, epochs=10):
     model.to(device)
-    model.train()  # set model to training mode
+    model.train()
     i = 0
     
     for epoch in range(epochs):
@@ -101,7 +108,6 @@ def train(model, train_loader, criterion, optimizer, device, epochs=10):
             
             running_loss += loss.item() * inputs.size(0)
             
-            # Calculate accuracy
             _, predicted = torch.max(outputs, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
@@ -122,18 +128,23 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_de
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-train(model, train_loader, criterion, optimizer, device, epochs=10)
 
+# CALL FUNCTION FOR TRAINING
+
+# train(model, train_loader, criterion, optimizer, device, epochs=10)
+
+
+# TEST FUNCTION
 
 def test(model, test_loader, criterion, device):
     model.to(device)
-    model.eval()  # evaluation mode disables dropout etc.
+    model.eval() 
 
     running_loss = 0.0
     correct = 0
     total = 0
 
-    with torch.no_grad():  # no gradient calculation
+    with torch.no_grad(): 
         for inputs, labels in test_loader:
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
@@ -149,4 +160,11 @@ def test(model, test_loader, criterion, device):
     print(f"Test Loss: {avg_loss:.4f} - Test Accuracy: {accuracy:.2f}%")
     return avg_loss, accuracy
 
-test(model, test_loader, criterion, device)
+# CALL FUNCTION FOR TESTING
+
+# test(model, test_loader, criterion, device) 
+
+
+# SAVE MODEL STATS
+
+# torch.save(model.state_dict(), 'model.pth')
