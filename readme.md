@@ -1,0 +1,1 @@
+A cnn for arabic alphabets
