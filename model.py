@@ -32,7 +32,7 @@ class CustomDataset(Dataset):
         label = self.labels[idx]
 
         image = Image.open(img_path).convert('L')  # grayscale
-        image = image.resize((128, 128))
+        image = image.resize((64, 64))
         image = np.array(image)
         image = torch.tensor(image).float() / 255.0  # normalize to 0-1
         image = image.unsqueeze(0)  # add channel dim [1, 300, 300]
@@ -63,11 +63,11 @@ class CNN(nn.Module):
         self.conv3 = nn.Conv2d(64, 128, 3, padding=1)
 
         # calculate flattened size after conv/pool layers:
-        # input: 128*128
-        # after pool1: 64*64
-        # after pool2: 32*32
-        # after pool3: 16*16 (because pooling again)
-        self.fc1 = nn.Linear(128 * 16 * 16, 512)
+        # input: 64*64
+        # after pool1: 32*32
+        # after pool1: 16*16
+        # after pool3: 8*8 (because pooling again)
+        self.fc1 = nn.Linear(128 * 8 * 8 * 512)
         self.fc2 = nn.Linear(512, num_classes)
         self.dropout = nn.Dropout(0.5)
 
@@ -75,7 +75,7 @@ class CNN(nn.Module):
         x = self.pool(F.relu(self.conv1(x)))  # -> 32 x 150 x 150
         x = self.pool(F.relu(self.conv2(x)))  # -> 64 x 75 x 75
         x = self.pool(F.relu(self.conv3(x)))  # -> 128 x 37 x 37
-        x = x.view(-1, 128 * 37 * 37)
+        x = x.view(-1, 128 * 8 * 8)
         x = self.dropout(F.relu(self.fc1(x)))
         x = self.fc2(x)
         return x
@@ -84,6 +84,7 @@ class CNN(nn.Module):
 def train(model, train_loader, criterion, optimizer, device, epochs=10):
     model.to(device)
     model.train()  # set model to training mode
+    i = 0
     
     for epoch in range(epochs):
         running_loss = 0.0
@@ -106,6 +107,8 @@ def train(model, train_loader, criterion, optimizer, device, epochs=10):
             _, predicted = torch.max(outputs, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+            print(epoch + i)
+            i = i + 1
         
         epoch_loss = running_loss / total
         epoch_acc = correct / total * 100
