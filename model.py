@@ -67,7 +67,7 @@ class CNN(nn.Module):
         # after pool1: 32*32
         # after pool1: 16*16
         # after pool3: 8*8 (because pooling again)
-        self.fc1 = nn.Linear(128 * 8 * 8 * 512)
+        self.fc1 = nn.Linear(128 * 8 * 8, 512)
         self.fc2 = nn.Linear(512, num_classes)
         self.dropout = nn.Dropout(0.5)
 
