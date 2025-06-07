@@ -131,7 +131,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # CALL FUNCTION FOR TRAINING
 
-# train(model, train_loader, criterion, optimizer, device, epochs=10)
+# train(model, train_loader, criterion, optimizer, device, epochs=30)
 
 
 # TEST FUNCTION
